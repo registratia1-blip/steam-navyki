@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Как я сработал сегодня? — STEAM 4 класс</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f5f5f5;min-height:100vh;padding:2rem 1rem;color:#212121}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem}
+.page-title{font-size:20px;font-weight:700;color:#1a1a1a}
+.page-sub{font-size:13px;color:#666;margin-top:4px}
+.criterion{display:flex;flex-direction:column;gap:8px}
+.crit-label{font-size:13px;font-weight:600;color:#444;display:flex;align-items:center;gap:6px}
+.crit-icon{font-size:16px}
+.cards-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media(max-width:500px){.cards-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.choice-card{background:#fff;border:2px solid #e0e0e0;border-radius:14px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .15s,background .15s}
+.choice-card:hover{background:#f9f9f9;border-color:#bdbdbd}
+.choice-card.selected-4{border-color:#3B6D11;background:#EAF3DE}
+.choice-card.selected-3{border-color:#185FA5;background:#E6F1FB}
+.choice-card.selected-2{border-color:#854F0B;background:#FAEEDA}
+.choice-card.selected-1{border-color:#A32D2D;background:#FCEBEB}
+.card-score{font-size:11px;font-weight:600;border-radius:20px;padding:3px 9px;margin-bottom:2px}
+.sc4{background:#EAF3DE;color:#27500A}
+.sc3{background:#E6F1FB;color:#0C447C}
+.sc2{background:#FAEEDA;color:#633806}
+.sc1{background:#FCEBEB;color:#791F1F}
+.card-text{font-size:11px;color:#666;text-align:center;line-height:1.4}
+.choice-card.selected-4 .card-text{color:#3B6D11}
+.choice-card.selected-3 .card-text{color:#185FA5}
+.choice-card.selected-2 .card-text{color:#854F0B}
+.choice-card.selected-1 .card-text{color:#791F1F}
+.check{font-size:16px;opacity:0}
+.choice-card.selected-4 .check,.choice-card.selected-3 .check,.choice-card.selected-2 .check,.choice-card.selected-1 .check{opacity:1}
+.btn-submit{width:100%;padding:14px;font-size:15px;font-weight:600;cursor:pointer;border-radius:14px;border:2px solid #bdbdbd;background:#eeeeee;color:#333;transition:background .15s}
+.btn-submit:hover:not(:disabled){background:#e0e0e0}
+.btn-submit:disabled{opacity:0.4;cursor:not-allowed}
+.result-box{background:#fff;border:1.5px solid #e0e0e0;border-radius:16px;padding:1.5rem;display:none;flex-direction:column;align-items:center;gap:14px}
+.result-emojis{font-size:52px;display:flex;gap:16px}
+.result-labels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.rlabel{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:10px;background:#f5f5f5}
+.rlabel-icon{font-size:22px}
+.rlabel-name{font-size:11px;color:#666;text-align:center}
+.rlabel-score{font-size:13px;font-weight:600}
+.rlabel-score.s4{color:#27500A}
+.rlabel-score.s3{color:#0C447C}
+.rlabel-score.s2{color:#633806}
+.rlabel-score.s1{color:#791F1F}
+.result-msg{font-size:14px;color:#444;text-align:center;line-height:1.55;max-width:440px}
+.btn-reset{font-size:13px;color:#888;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0}
+.btn-reset:hover{color:#333}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="page-title">🌿 Как я сработал сегодня?</div>
+    <div class="page-sub">Выбери одну карточку в каждом разделе — ту, что больше всего про тебя</div>
+  </div>
+
+  <div class="criterion">
+    <div class="crit-label"><span class="crit-icon">🤝</span>Сотрудничество</div>
+    <div class="cards-row">
+      <div class="choice-card" data-crit="0" data-val="4" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc4">★★★★</div>
+        <div class="card-text">Я помогал всем и мы работали дружно</div>
+      </div>
+      <div class="choice-card" data-crit="0" data-val="3" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc3">★★★</div>
+        <div class="card-text">Я выполнял своё и помогал команде</div>
+      </div>
+      <div class="choice-card" data-crit="0" data-val="2" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc2">★★</div>
+        <div class="card-text">Я работал больше сам и отвлекался</div>
+      </div>
+      <div class="choice-card" data-crit="0" data-val="1" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc1">★</div>
+        <div class="card-text">Я почти не участвовал или спорил</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criterion">
+    <div class="crit-label"><span class="crit-icon">🎨</span>Креативность</div>
+    <div class="cards-row">
+      <div class="choice-card" data-crit="1" data-val="4" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc4">★★★★</div>
+        <div class="card-text">Проект получился оригинальным и ярким</div>
+      </div>
+      <div class="choice-card" data-crit="1" data-val="3" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc3">★★★</div>
+        <div class="card-text">Хорошо, но похоже на другие работы</div>
+      </div>
+      <div class="choice-card" data-crit="1" data-val="2" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc2">★★</div>
+        <div class="card-text">Не закончено или идеи неясны</div>
+      </div>
+      <div class="choice-card" data-crit="1" data-val="1" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc1">★</div>
+        <div class="card-text">Работа не готова, трудно понять</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criterion">
+    <div class="crit-label"><span class="crit-icon">💻</span>Цифровые инструменты</div>
+    <div class="cards-row">
+      <div class="choice-card" data-crit="2" data-val="4" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc4">★★★★</div>
+        <div class="card-text">Работал в Canva / Tinkercad сам</div>
+      </div>
+      <div class="choice-card" data-crit="2" data-val="3" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc3">★★★</div>
+        <div class="card-text">По образцу, иногда нужны подсказки</div>
+      </div>
+      <div class="choice-card" data-crit="2" data-val="2" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc2">★★</div>
+        <div class="card-text">Только простые функции, с помощью</div>
+      </div>
+      <div class="choice-card" data-crit="2" data-val="1" onclick="pick(this)">
+        <div class="check">✅</div><div class="card-score sc1">★</div>
+        <div class="card-text">Не смог работать самостоятельно</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="btn" onclick="showResult()" disabled>Узнать мой результат</button>
+
+  <div class="result-box" id="result">
+    <div class="result-emojis" id="res-emojis"></div>
+    <div class="result-labels" id="res-labels"></div>
+    <div class="result-msg" id="res-msg"></div>
+    <button class="btn-reset" onclick="reset()">Начать заново</button>
+  </div>
+</div>
+
+<script>
+const chosen = [null, null, null];
+const emojis = {
+  4: ['🌟','🏆','💚','🥇','🎉','🦁','🚀'],
+  3: ['👍','😊','🌿','✨','🐢','🌈'],
+  2: ['🌱','💪','😐','🐣','🔧'],
+  1: ['🌧️','😔','🐌','💤','🔄']
+};
+const msgs = {
+  '444': 'Ты настоящий STEAM-герой! Отличная работа во всём — гордись собой! 🌟',
+  '333': 'Хорошая работа! Ты стараешься и движешься вперёд. Продолжай так! 👍',
+  '222': 'Ты в процессе — это нормально! Завтра получится лучше. Не сдавайся! 💪',
+  '111': 'Новое начало — это тоже шаг вперёд. Попроси помощи и попробуй снова! 🌱',
+};
+const scoreNames = ['Начало','В процессе','Хорошо','Отлично'];
+const critNames = ['Сотрудничество','Креативность','Цифровые инструменты'];
+const scoreClass = ['','s1','s2','s3','s4'];
+
+function pick(el) {
+  const crit = +el.dataset.crit;
+  const val = +el.dataset.val;
+  document.querySelectorAll(`[data-crit="${crit}"]`).forEach(c => c.className = 'choice-card');
+  el.classList.add('selected-' + val);
+  chosen[crit] = val;
+  document.getElementById('btn').disabled = chosen.some(v => v === null);
+}
+
+function showResult() {
+  const total = chosen.reduce((a,b) => a+b, 0);
+  document.getElementById('res-emojis').textContent = chosen.map(v => {
+    const pool = emojis[v];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }).join('  ');
+
+  document.getElementById('res-labels').innerHTML = chosen.map((v,i) => `
+    <div class="rlabel">
+      <div class="rlabel-icon">${['🤝','🎨','💻'][i]}</div>
+      <div class="rlabel-name">${critNames[i]}</div>
+      <div class="rlabel-score ${scoreClass[v]}">${scoreNames[v-1]} (${v})</div>
+    </div>
+  `).join('');
+
+  const key = chosen.join('');
+  const avg = total / 3;
+  let msg = msgs[key];
+  if (!msg) {
+    if (avg >= 3.5) msg = 'Отличный результат! Ты очень хорошо поработал сегодня! 🌟';
+    else if (avg >= 2.5) msg = 'Хорошая работа! Есть над чем расти — и ты на верном пути! 😊';
+    else if (avg >= 1.5) msg = 'Ты ещё только учишься — это нормально. Каждый раз будет лучше! 🌱';
+    else msg = 'Попробуй ещё раз и попроси помощи у учителя или друзей! 💪';
+  }
+  document.getElementById('res-msg').textContent = msg;
+  document.getElementById('result').style.display = 'flex';
+  document.getElementById('btn').style.display = 'none';
+}
+
+function reset() {
+  chosen.fill(null);
+  document.querySelectorAll('.choice-card').forEach(c => c.className = 'choice-card');
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('btn').style.display = '';
+  document.getElementById('btn').disabled = true;
+}
+</script>
+</body>
+</html>
